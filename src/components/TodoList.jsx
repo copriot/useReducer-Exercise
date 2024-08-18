@@ -1,4 +1,4 @@
-import { useReducer } from "react";
+import { useReducer, useEffect, useState } from "react";
 import todoReducer from "../reducers/todoReducer";
 
 const initialState = {
@@ -6,16 +6,52 @@ const initialState = {
   todos: [],
 };
 
+// Local Storage'dan veri yükleme
+const loadFromLocalStorage = () => {
+  const savedState = localStorage.getItem("todoState");
+  if (savedState) {
+    return JSON.parse(savedState);
+  }
+  return initialState;
+};
+
+// Local Storage'a veri kaydetme
+const saveToLocalStorage = (state) => {
+  localStorage.setItem("todoState", JSON.stringify(state));
+};
+
 const TodoList = () => {
-  const [state, dispatch] = useReducer(todoReducer, initialState);
+  // State'i localStorage'dan yükleyin
+  const [state, dispatch] = useReducer(todoReducer, loadFromLocalStorage());
+
+  // State değiştikçe localStorage'a kaydet
+  useEffect(() => {
+    saveToLocalStorage(state);
+  }, [state]);
+
+  const [editMode, setEditMode] = useState(null); // Düzenleme modunu yönetmek için
+  const [editText, setEditText] = useState(""); // Düzenleme formundaki metin
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const text = e.target[0].value;
-    //console.log(text);
-    //yeni bir eleman olusturulacagini reducura haber ver
     dispatch({ type: "CREATE", payload: text });
+    e.target.reset();
+  };
+
+  const handleEdit = (todo) => {
+    setEditMode(todo.id);
+    setEditText(todo.text);
+  };
+
+  const handleUpdate = (e) => {
+    e.preventDefault();
+    dispatch({
+      type: "UPDATE_TODO",
+      payload: { id: editMode, newText: editText },
+    });
+    setEditMode(null);
+    setEditText("");
   };
 
   return (
@@ -25,7 +61,7 @@ const TodoList = () => {
       }`}
     >
       <div className="container p-5">
-        <div className=" d-flex justify-content-between align align-items-center">
+        <div className="d-flex justify-content-between align-items-center">
           <h2 className="text-center">Todo List</h2>
           <button
             className="btn btn-warning"
@@ -41,10 +77,38 @@ const TodoList = () => {
           <input className="form-control shadow" type="text" />
           <button className="btn btn-info shadow">Gönder</button>
         </form>
+        {editMode && (
+          <form onSubmit={handleUpdate} className="mb-3">
+            <input
+              className="form-control shadow"
+              type="text"
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+            />
+            <button className="btn btn-warning shadow mt-1">Güncelle</button>
+          </form>
+        )}
         <ul className="list-group">
           {state.todos.map((todo) => (
-            <li key={todo.id} className="list-group-item">
+            <li
+              key={todo.id}
+              className="list-group-item d-flex justify-content-between align-items-center"
+            >
               <span>{todo.text}</span>
+              <div className="d-flex gap-2">
+                <button
+                  onClick={() => handleEdit(todo)}
+                  className="btn btn-success"
+                >
+                  Düzenle
+                </button>
+                <button
+                  onClick={() => dispatch({ type: "DELETE", payload: todo.id })}
+                  className="btn btn-danger"
+                >
+                  Sil
+                </button>
+              </div>
             </li>
           ))}
         </ul>

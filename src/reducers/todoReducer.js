@@ -15,13 +15,26 @@ const todoReducer = (state, action) => {
             const updated = [...state.todos, newTodo]
             // const updated2 = state.todos.concat(newTodo)
 
-
-
             //statein güncel halini belirle
-            return { ...state, todos: updated }
+            return { ...state, todos: updated };
 
-        default: return state;
+        case "DELETE":
+            // aksiyonun payloadi ile gelen idli elemanı diziden kaldir
+            const filteredTodos = state.todos.filter((i) => i.id !== action.payload)
+
+            //statei güncelle
+            return { ...state, todos: filteredTodos };
+
+        case "UPDATE_TODO":
+            const { id, newText } = action.payload;
+            const updatedTodos = state.todos.map(todo =>
+                todo.id === id ? { ...todo, text: newText } : todo
+            );
+            return { ...state, todos: updatedTodos };
+
     };
+
+
 
 
 
