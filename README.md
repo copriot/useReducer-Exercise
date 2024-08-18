@@ -1,7 +1,3 @@
-##Dispatch (Sevk etmek)
+##LİNK
 
--Actionları bileşen icerisinden reducer'a aktarır
-
-#Action
-
--State'in nasıl degisecegini ifade eden metin
+https://todolist-dev-zek.netlify.app
