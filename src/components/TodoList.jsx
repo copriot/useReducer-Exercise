@@ -21,7 +21,7 @@ const saveToLocalStorage = (state) => {
 };
 
 const TodoList = () => {
-  // State'i localStorage'dan yükleyin
+  // State'i localStorage'dan yükle
   const [state, dispatch] = useReducer(todoReducer, loadFromLocalStorage());
 
   // State değiştikçe localStorage'a kaydet
@@ -98,7 +98,7 @@ const TodoList = () => {
               <div className="d-flex gap-2">
                 <button
                   onClick={() => handleEdit(todo)}
-                  className="btn btn-success"
+                  className="btn btn-warning"
                 >
                   Düzenle
                 </button>
